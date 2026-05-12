@@ -1,261 +1,336 @@
-# PLC 업무 보조 문서화 자동화 포트폴리오
+# 비정형 수주서 기반 PLC 설계 검토 패키지 자동 생성 샘플
 
-자연어로 작성된 공정 설명을 바탕으로 PLC 관련 검토용 문서와 코드 초안을 정리하는 개인 포트폴리오 프로젝트입니다.
+## 1. 프로젝트 개요
 
-이 프로젝트는 PLC 엔지니어의 판단을 대체하기 위한 것이 아닙니다.  
-반복적인 문서 정리, IO 목록 정리, 제어 조건 정리, 결과 파일 정리 업무를 보조하기 위한 자동화 실험 프로젝트입니다.
+이 저장소는 비정형 수주서 메모를 입력으로 받아, PLC 설계 검토에 필요한 1차 산출물을 자동 구성한 포트폴리오 샘플입니다.
 
----
+본 샘플은 폐수처리 설비를 대상으로 한 IO200급 공개용 검토 패키지이며, 실제 현장 투입용 확정본이 아니라 선임 엔지니어 검토를 위한 **REVIEW ONLY** 자료입니다.
 
-## 프로젝트 개요
-
-제조 자동화 업무에서는 공정 설명, IO 목록, 장비 동작 조건, 안전 조건 등을 정리해야 합니다.
-
-이 과정에는 반복적인 문서 작업이 많습니다.
-
-예를 들면 다음과 같습니다.
-
-- 입력 신호와 출력 신호 구분
-- 장비 동작 순서 정리
-- 안전 조건 정리
-- 알람 조건 정리
-- 검토용 문서 작성
-- 코드 초안 정리
-- 테스트 결과 정리
-
-본 프로젝트는 이러한 반복 작업을 AI 도구와 자동화 스크립트를 활용해 줄여보기 위해 만든 포트폴리오입니다.
+생성 대상은 **LS XGT / XG5000 기준의 검토용 자료**입니다.
 
 ---
 
-## 프로젝트의 목적
+## 2. 입력 예시
 
-이 프로젝트의 목적은 완성된 PLC 프로그램을 바로 현장에 적용하는 것이 아닙니다.
+입력은 상세 설계서가 아니라, 현장에서 받을 수 있는 간단 메모형 수주서입니다.
 
-목적은 다음과 같습니다.
+```text
+2공장 세척라인 폐수 집수조 자동제어를 구성하려고 합니다.
+집수조는 2개이고, 1번 집수조에는 배수펌프 3대,
+2번 집수조에는 이송펌프 2대가 있습니다.
 
-- 공정 설명을 읽고 필요한 항목을 정리하기
-- 입력, 출력, 내부 조건을 구분하기
-- 공정 흐름을 단계별로 문서화하기
-- 안전 조건과 알람 조건을 정리하기
-- PLC 엔지니어가 검토할 수 있는 초안 자료를 만들기
-- 반복적인 문서 작성 시간을 줄이기
+각 펌프는 교번운전이 필요하고,
+수위에 따라 1대/2대/3대 단계 운전이 되었으면 합니다.
+펌프 한 대 고장 시 나머지 펌프가 자동으로 대체 운전되면 좋겠습니다.
 
-즉, 이 프로젝트는 현장 엔지니어의 판단을 대신하는 도구가 아니라, 검토 전 단계의 자료를 빠르게 준비하는 보조 도구입니다.
+Low, Mid, High, High-High 수위센서와
+아날로그 수위계를 HMI에 표시하고 싶습니다.
 
----
+펌프 운전 상태, 고장, 과부하, MCC 차단기 상태,
+밸브 열림/닫힘 피드백, 누수감지, 경광등/부저,
+복전 후 재기동 확인, Maintenance Mode도 필요합니다.
 
-## 현재 구현된 기능
-
-현재 샘플 공정을 기준으로 다음 기능을 구현했습니다.
-
-- 자연어 공정 설명 입력
-- IO 목록 정리
-- 입력, 출력, 내부 조건 구분
-- 공정 흐름 정리
-- 안전 조건 정리
-- 알람 조건 정리
-- 검토용 코드 초안 생성
-- 주소 매핑표 생성
-- 래더 검토용 문서 초안 생성
-- 생성 결과 자동 점검 리포트 생성
+LS XGT / XG5000 기준으로
+IO List, HMI 태그, 알람표, 인터락표, ST/Ladder 초안,
+도면 후보, XG5000 Import CSV까지 정리되면 좋겠습니다.
+```
 
 ---
 
-## 처리 흐름
+## 3. 생성 결과 요약
 
-자연어 공정 설명  
-↓  
-IO 목록 정리  
-↓  
-제어 조건 정리  
-↓  
-검토용 코드 초안 생성  
-↓  
-주소 매핑표 생성  
-↓  
-래더 검토용 문서 생성  
-↓  
-자동 점검 리포트 생성
-
----
-
-## 샘플 공정
-
-현재 테스트에 사용한 샘플은 가열 혼합 공정입니다.
-
-공정 흐름은 다음과 같습니다.
-
-원료 투입  
-↓  
-가열  
-↓  
-교반  
-↓  
-배출  
-↓  
-세척
-
-포함된 주요 조건은 다음과 같습니다.
-
-- 자동 운전 조건
-- 수동 운전 조건
-- 비상정지 조건
-- 수위 조건
-- 과열 방지 조건
-- 배출 조건
-- 시간 초과 알람
-- 알람 리셋 조건
-
----
-
-## 생성 결과 예시
-
-테스트 실행 후 다음과 같은 결과물이 생성됩니다.
-
-outputs/  
-├─ 검토용_코드_초안  
-├─ 주소_매핑표  
-├─ 래더_검토용_문서  
-├─ 래더_주소_매핑표  
-└─ 자동_점검_리포트
-
-각 파일의 의미는 다음과 같습니다.
-
-| 결과물 | 설명 |
+| 항목 | 내용 |
 |---|---|
-| 검토용 코드 초안 | PLC 엔지니어가 검토할 수 있는 코드 초안 |
-| 주소 매핑표 | 신호 이름과 주소를 연결한 표 |
-| 래더 검토용 문서 | 래더 형태로 검토할 수 있도록 정리한 문서 |
-| 래더 주소 매핑표 | 래더 검토용 문서 기준 주소표 |
-| 자동 점검 리포트 | 결과물이 정상 생성되었는지 확인하는 리포트 |
+| Case ID | PLC-20260512-WASTEWATER-IO200-001 |
+| 설비 유형 | 폐수처리 집수조 자동제어 |
+| 입력 유형 | 간단 메모형 비정형 수주서 |
+| IO 규모 | 약 200점 |
+| 벤더 기준 | LS XGT / XG5000 |
+| 결과물 성격 | 설계 검토용 초안 |
+| 사용 목적 | 선임 엔지니어 검토 보조 |
+| 현장 투입 여부 | confirmed_for_plc_run=false |
+| 검토 필요 여부 | review_required=true |
 
 ---
 
-## 최근 테스트 결과
+## 4. 산출물 구성
 
-최근 테스트에서는 다음 항목을 확인했습니다.
+```text
+README.md
+sample_order.txt
 
-[OK] 검토용 코드 초안 생성  
-[OK] 래더 검토용 문서 생성  
-[OK] 주소 매핑표 생성  
-[OK] 주요 출력 조건 포함  
-[OK] 자동 점검 리포트 생성  
-[OK] 결과 파일 정리 완료
+01_summary/
+  package_summary.json
 
-생성된 검토용 문서에는 다음과 같은 내용이 포함됩니다.
+02_io_hmi/
+  io_list.csv
+  hmi_tag_table_sample.csv
+  hmi_alarm_table_sample.csv
 
-- 안전 조건
-- 상태 흐름
-- 정지 조건
-- 알람 조건
-- 출력 조건
-- 주소 매핑 정보
+03_logic_review/
+  st_draft_sample.txt
+  ladder_draft_sample.md
+  ladder_draft_visual.pdf
+  ladder_visual_qa_report.json
+  checklist.md
+  risk_flags.md
 
----
+04_electrical_review/
+  terminal_list_sample.csv
+  cable_list_sample.csv
+  bom_sample.csv
+  rule_check_report_sample.csv
 
-## 실행 예시
+05_drawings/
+  P04_DO_001_020_sample.pdf
+  P99_SAFETY_CIRCUIT_WIRING_CANDIDATE.svg
+  drawing_qa_report_sample.json
 
-테스트용 샘플을 실행하려면 다음 명령어를 사용합니다.
+05_xg5000_import_ready/
+  xg5000_variable_description_import_sample.csv
+  xg5000_import_ready_final_verdict.md
+  xg5000_import_ready_manifest.json
+  xg5000_import_checklist.md
 
-python test_xgt_flow.py
-
-테스트가 끝난 후 제출용 폴더를 만들려면 다음 명령어를 사용합니다.
-
-python make_xgt_submission_pack.py
-
----
-
-## 현재 상태
-
-현재 단계는 다음 흐름까지 동작하는 것을 확인했습니다.
-
-자연어 수주서  
-↓  
-IO 목록 정리  
-↓  
-제어 조건 정리  
-↓  
-검토용 코드 초안 생성  
-↓  
-래더 검토용 문서 생성  
-↓  
-자동 점검 리포트 생성
-
-현재 결과물은 현장에 바로 적용하는 완성 프로그램이 아닙니다.  
-PLC 엔지니어가 검토하기 전 단계의 초안 자료입니다.
+07_screenshots/
+  xg5000_import_success_001.png
+  xg5000_import_success_002.png
+```
 
 ---
 
-## 프로젝트에서 중점적으로 본 부분
+## 5. 주요 기능
 
-이 프로젝트에서 가장 중요하게 본 부분은 결과물을 사람이 검토할 수 있는 형태로 정리하는 것입니다.
+### 5.1 IO 목록 생성
 
-특히 다음 부분에 중점을 두었습니다.
+비정형 수주서 내용을 기반으로 IO 후보를 구성합니다.
 
-- 사람이 읽을 수 있는 문서 구조
-- IO 목록 정리
-- 주소 매핑표 제공
-- 안전 조건과 알람 조건 분리
-- 상태 흐름을 단계별로 정리
-- 자동 테스트 리포트 생성
-- 생성 결과를 제출용 폴더로 정리
+포함 항목:
 
----
-
-## 포트폴리오 관점에서의 의미
-
-이 프로젝트는 제가 다음 역량을 갖추고 있음을 보여주기 위한 포트폴리오입니다.
-
-- 공정 요구사항을 정리하는 능력
-- IO 목록과 조건을 문서화하는 능력
-- 반복 작업을 자동화하는 문제 해결 능력
-- AI 도구를 활용해 작업 흐름을 개선한 경험
-- 생성 결과를 검증하고 정리하는 습관
-- 현장 담당자가 검토할 수 있는 형태로 자료를 정리하는 능력
+- 입력 신호
+- 출력 신호
+- 안전 관련 신호
+- HMI 표시 후보
+- Spare IO
+- 설명문
+- XG5000 반입용 변수 설명 CSV
 
 ---
 
-## 제가 맡을 수 있는 역할
+### 5.2 XG5000 Import 후보 파일 생성
 
-이 프로젝트를 통해 제가 보여드리고 싶은 역할은 다음과 같습니다.
+XG5000에서 변수 설명 Import를 시도할 수 있는 CSV 후보 파일을 생성합니다.
 
-- PLC 설계 보조
-- IO 목록 정리
-- 제어 조건 문서화
-- 코드 초안 정리 보조
-- 테스트 결과 정리
-- 반복 문서 작업 자동화
-- 현장 엔지니어 검토용 자료 작성
+포함 항목:
 
-PLC 현장 경험이 풍부한 엔지니어의 판단을 대체하기보다, 검토 가능한 초안과 문서를 빠르게 준비하는 역할에 강점이 있습니다.
+- 변수명
+- 타입
+- 디바이스 주소
+- 사용 여부
+- HMI 표시 여부
+- 설명문
 
----
-
-## 사용 전제
-
-본 프로젝트의 결과물은 검토용 초안입니다.
-
-현장 장비에 직접 적용하기 전에는 반드시 PLC 엔지니어의 검토와 테스트가 필요합니다.
-
-이 프로젝트는 실무자의 검토 시간을 줄이고, 초기 초안 작성과 문서화 과정을 보조하는 것을 목표로 합니다.
+본 샘플은 실제 `.xgw` 또는 `.xgp` 프로젝트 파일을 생성하지 않습니다.
+XG5000 테스트 프로젝트에서 Import, Build, Compile 검토를 수행하기 전 단계의 후보 파일세트입니다.
 
 ---
 
-## 향후 개선 계획
+### 5.3 ST Draft 생성
 
-앞으로 다음 항목을 보강할 계획입니다.
+ST 초안에는 다음 흐름이 포함됩니다.
 
-- 실제 장비 또는 시뮬레이터 테스트
-- 실행 화면 캡처 추가
-- 샘플 시연 영상 추가
-- 컨베이어 공정 샘플 보강
-- 밸브 제어 샘플 보강
-- 물탱크 제어 샘플 보강
-- 테스트 리포트 이미지 추가
-- README에 실행 화면 이미지 추가
+- Master Safety 조건
+- Auto / Manual Mode Gate
+- Maintenance Mode Gate
+- Fault Latch SET / RESET
+- 펌프 교번운전 후보
+- 수위 단계별 펌프 투입 후보
+- 누수 감지 시 구역별 정지 후보
+- 복전 후 HMI 재기동 확인 조건
+- 타임아웃 기반 Fault 전이
+
+예시 구조:
+
+```pascal
+SAFETY_OK :=
+  ESTOP_OK
+  AND MCC_MAIN_POWER_OK
+  AND UPS_POWER_OK
+  AND NOT LEAK_DETECTED_ANY
+  AND NOT OVERLOAD_ANY;
+
+IF POWER_RECOVERY_DETECTED THEN
+    RESUME_REQUIRED := TRUE;
+END_IF;
+
+IF HMI_RESUME_CONFIRM_PB AND ALARM_RESET_PB THEN
+    RESUME_REQUIRED := FALSE;
+END_IF;
+```
 
 ---
 
-## 한 줄 요약
+### 5.4 Ladder Draft 생성
 
-자연어 공정 설명을 바탕으로 PLC 관련 검토용 코드 초안, 주소 매핑표, 래더 검토용 문서, 테스트 리포트를 자동으로 정리하는 포트폴리오 프로젝트입니다.
+Ladder Draft는 사람이 읽을 수 있는 네트워크 단위 검토 문서로 생성됩니다.
+
+예시:
+
+```text
+N001 - Master Safety Permit
+ESTOP_OK AND MCC_MAIN_POWER_OK AND UPS_POWER_OK -> SAFETY_OK
+
+N002 - Power Recovery Hold
+POWER_RECOVERY_DETECTED -> SET RESUME_REQUIRED
+HMI_RESUME_CONFIRM_PB AND ALARM_RESET_PB -> RESET RESUME_REQUIRED
+
+N007 - T1 Stage Demand
+MID=1 pump, HIGH=2 pumps, HIGH_HIGH=3 pumps candidate
+
+N019 - Pump Start Fail Timer
+RUN_CMD AND NOT RUN_FB -> T_PUMP_START_FAIL -> alarm
+```
+
+---
+
+### 5.5 Ladder Visual PDF 생성
+
+Ladder Draft를 PDF 형태로 시각화하여, XG5000 반입 전 로직 흐름을 사전 검토할 수 있도록 구성했습니다.
+
+포함 내용:
+
+- Master Safety Permit
+- Power Recovery Hold
+- Auto / Manual Mode Interlock
+- Maintenance Mode
+- Pump Availability
+- Pump Alternation Counter
+- Pump Run Command
+- Dry Run Protection
+- Leak Stop Zone
+- Pump Start Fail Timer
+- No Flow Timer
+- Valve Open / Close Fail Timer
+- Tower Lamp / Buzzer
+- Alarm Reset / Acknowledge
+- HMI Manual Output Gate
+- Runtime Counter
+- Communication Alarm
+- Level Transmitter Fault
+- Emergency Drain Review Flag
+- Spare IO Isolation
+
+---
+
+### 5.6 전장 도면 후보 생성
+
+IO 목록을 기반으로 검토용 전장 도면 후보 PDF/SVG를 생성합니다.
+
+포함 예시:
+
+- DI/DO 주소 후보
+- 펌프 운전 명령
+- 밸브 열림/닫힘 명령
+- 경광등/부저 출력
+- DO COM 그룹
+- PLC Panel 후보
+- Spare 미결선 표시
+- REVIEW ONLY 표시
+
+---
+
+### 5.7 QA 리포트 생성
+
+도면과 Ladder 시각화 결과에 대해 QA 리포트를 생성합니다.
+
+검토 항목 예시:
+
+- IO 개수 정합성
+- 페이지별 장치 수 제한
+- 연결 수 검토
+- DO COM 그룹 표시
+- Spare 미결선 표시
+- REVIEW ONLY 표시
+- Ladder Network 수
+- 출력 Coil 수
+- 긴 라벨 줄바꿈 처리
+- Negative Contact 표시
+
+---
+
+## 6. 안전 및 검수 원칙
+
+이 저장소의 모든 산출물은 실제 설비 RUN 또는 다운로드 확정본이 아닙니다.
+
+반드시 다음 절차가 필요합니다.
+
+1. 현장 IO 실사
+2. 실제 PLC 모듈 및 슬롯 확인
+3. XG5000 Import 테스트
+4. Build / Compile 수행
+5. 오프라인 시뮬레이션
+6. 선임 엔지니어 검토
+7. 전기/안전 담당자 검토
+8. 현장 시운전 전 최종 승인
+
+---
+
+## 7. 주요 Risk Flag
+
+| 코드 | 등급 | 내용 |
+|---|---|---|
+| RF-001 | critical | 실제 펌프/밸브/센서 수량은 현장 실사 필요 |
+| RF-002 | critical | 안전회로는 후보이며 실제 안전 릴레이/배선 확정 아님 |
+| RF-003 | high | Spare IO가 실제 동작 로직에 잘못 연결될 위험 |
+| RF-004 | high | 아날로그 수위계 스케일링 및 상하한 기준 미확정 |
+| RF-005 | high | 저수위 공회전 방지와 초고수위 비상배수 조건 충돌 가능성 검토 필요 |
+| RF-006 | medium | X/Y/M/D 주소는 실제 카드 구성에 따라 변경 필요 |
+| RF-007 | medium | 복전 후 자동 재기동 금지 조건은 현장 운전 정책 확인 필요 |
+
+---
+
+## 8. 본 저장소에 포함하지 않는 것
+
+본 저장소에는 아래 항목을 포함하지 않습니다.
+
+- 원본 PLC Package JSON 전체
+- 도메인맵 원본
+- 스키마 원본
+- 생성기 원본 코드
+- 랩핑기 원본 코드
+- 어댑터 원본 코드
+- 내부 평가 로직
+- 전체 ZIP 원본
+- 백업 폴더
+- Turn별 내부 개발 리포트
+
+이 저장소는 엔진 원본 공개가 아니라, 엔진이 생성한 검토용 산출물 샘플을 보여주기 위한 포트폴리오입니다.
+
+---
+
+## 9. 포트폴리오 설명 문장
+
+비정형 간단 메모형 수주서를 기준으로 폐수처리 집수조 자동제어 IO200급 PLC 설계 검토 패키지를 구성했습니다. 산출물은 IO List, HMI Tag/Alarm Table, XG5000 변수 설명 Import CSV, ST/Ladder 초안, Ladder 시각화 PDF, 인터락·알람 검토표, 전장 도면 후보, Drawing QA 리포트, 체크리스트와 리스크 플래그로 구성했으며, 모든 결과물은 실제 RUN 확정본이 아닌 선임 엔지니어 검토용 REVIEW ONLY 자료로 정리했습니다.
+
+---
+
+## 10. 사용 목적
+
+이 프로젝트는 다음 역량을 보여주기 위한 포트폴리오입니다.
+
+- 비정형 수주서 해석
+- PLC 설계 자료 구조화
+- IO/HMI/알람/인터락 정리
+- XG5000 Import 후보 파일 생성
+- ST/Ladder 초안 생성
+- Ladder 시각화
+- 전장 도면 후보 생성
+- QA 리포트 구성
+- REVIEW ONLY 기준의 안전한 검토 패키지 구성
+
+---
+
+## 11. 주의
+
+본 샘플은 학습 및 포트폴리오 목적의 검토용 자료입니다.
+실제 설비에 적용하기 위해서는 반드시 현장 엔지니어, 전기 담당자, 안전 담당자의 검토와 XG5000 Build/Compile, 오프라인 테스트, 현장 시운전 절차가 필요합니다.
