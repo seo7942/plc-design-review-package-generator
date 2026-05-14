@@ -1,316 +1,225 @@
-# 비정형 수주서 기반 PLC 설계 검토 패키지 자동 생성 샘플
+# PLC Design Review Package Generator
 
-## 1. 프로젝트 개요
+## 비정형 수주서 기반 IO500급 PLC 설계 검토 패키지 자동 생성 샘플
 
-이 저장소는 비정형 수주서 메모를 입력으로 받아, PLC 설계 검토에 필요한 1차 산출물을 자동 구성한 포트폴리오 샘플입니다.
+이 저장소는 현장에서 받을 수 있는 **간단 메모형 수주서**를 입력으로 받아, PLC 엔지니어가 1차 검토할 수 있는 설계 초안 패키지를 자동 구성한 포트폴리오 샘플입니다.
 
-본 샘플은 폐수처리 설비를 대상으로 한 IO200급 공개용 검토 패키지이며, 실제 현장 투입용 확정본이 아니라 선임 엔지니어 검토를 위한 **REVIEW ONLY** 자료입니다.
+대상 설비는 **폐수처리 자동화 설비**이며, 생성 기준은 **LS XGT / XG5000 검토용**입니다.
 
-생성 대상은 **LS XGT / XG5000 기준의 검토용 자료**입니다.
+본 산출물은 실제 현장 RUN 확정본이 아니라, 선임 엔지니어가 검토하기 전 단계의 **REVIEW ONLY 설계 검토 자료**입니다.
 
 ---
 
-## 2. 입력 예시
+## 1. 입력 수주서 개요
 
-입력은 상세 설계서가 아니라, 현장에서 받을 수 있는 간단 메모형 수주서입니다.
+입력은 상세 설계서가 아니라 아래와 같은 형태의 비정형 메모입니다.
 
 ```text
-2공장 세척라인 폐수 집수조 자동제어를 구성하려고 합니다.
-집수조는 2개이고, 1번 집수조에는 배수펌프 3대,
-2번 집수조에는 이송펌프 2대가 있습니다.
+폐수 처리 쪽 자동화 하나 잡아주세요.
 
-각 펌프는 교번운전이 필요하고,
-수위에 따라 1대/2대/3대 단계 운전이 되었으면 합니다.
-펌프 한 대 고장 시 나머지 펌프가 자동으로 대체 운전되면 좋겠습니다.
+탱크가 여러 개 있고 펌프, 밸브, 약품 투입, 교반기,
+슬러지 배출, 컨베이어 조금 있습니다.
 
-Low, Mid, High, High-High 수위센서와
-아날로그 수위계를 HMI에 표시하고 싶습니다.
+자동 운전으로 바꾸고 HMI에서 상태 보고 수동도 가능하게 해주세요.
 
-펌프 운전 상태, 고장, 과부하, MCC 차단기 상태,
-밸브 열림/닫힘 피드백, 누수감지, 경광등/부저,
-복전 후 재기동 확인, Maintenance Mode도 필요합니다.
+원수 유입 탱크, 약품 투입 탱크, 중화 탱크,
+세정/린스 탱크, 슬러지 배출 라인, 최종 배출 라인이 있습니다.
 
-LS XGT / XG5000 기준으로
-IO List, HMI 태그, 알람표, 인터락표, ST/Ladder 초안,
-도면 후보, XG5000 Import CSV까지 정리되면 좋겠습니다.
+pH, 온도, 유량, 압력, 수위 정도는 봐야 합니다.
+펌프랑 밸브가 많고, IO는 예비 포함 500점 정도로 잡아주세요.
+
+LS XGT 기준이면 좋고,
+나중에 XG5000에 넣을 수 있게 주소표와 ST/Ladder 초안,
+도면도 검토용으로 뽑아주세요.
+
+HMI는 운전 화면, 알람 화면, IO 모니터 정도면 됩니다.
+모든 결과물은 REVIEW ONLY로 표시해주세요.
+confirmed_for_plc_run=false 유지해주세요.
 ```
 
 ---
 
-## 3. 생성 결과 요약
+## 2. 생성 결과 요약
 
 | 항목 | 내용 |
 |---|---|
-| Case ID | PLC-20260512-WASTEWATER-IO200-001 |
-| 설비 유형 | 폐수처리 집수조 자동제어 |
-| 입력 유형 | 간단 메모형 비정형 수주서 |
-| IO 규모 | 약 200점 |
-| 벤더 기준 | LS XGT / XG5000 |
-| 결과물 성격 | 설계 검토용 초안 |
-| 사용 목적 | 선임 엔지니어 검토 보조 |
-| 현장 투입 여부 | confirmed_for_plc_run=false |
+| Case ID | PLC-20260512-TYPE4-IO500-WW-001 |
+| 수주서 유형 | 간단 메모형 비정형 수주서 |
+| 설비 유형 | 폐수처리 자동화 설비 |
+| IO 규모 | IO500급 |
+| 벤더 기준 | LS XGT / XG5000 검토용 |
+| 결과물 성격 | PLC 설계 1차 초안 / REVIEW ONLY |
+| 현장 RUN 여부 | confirmed_for_plc_run=false |
 | 검토 필요 여부 | review_required=true |
 
 ---
 
-## 4. 산출물 구성
+## 3. 공개 산출물 구성
+
+본 저장소에는 포트폴리오 확인에 필요한 대표 산출물만 포함합니다.
 
 ```text
 README.md
-sample_order.txt
 
-01_summary/
-  package_summary.json
+01_review_pdf/
+  IO500_REVIEW_ONLY_PACKAGE.pdf
 
-02_io_hmi/
-  io_list.csv
-  hmi_tag_table_sample.csv
-  hmi_alarm_table_sample.csv
+02_hmi/
+  hmi_tag_table.csv
 
-03_logic_review/
-  st_draft_sample.txt
-  ladder_draft_sample.md
-  ladder_draft_visual.pdf
-  ladder_visual_qa_report.json
-  checklist.md
-  risk_flags.md
+03_xg5000/
+  xg5000_variable_description_import.csv
 
-04_electrical_review/
-  terminal_list_sample.csv
-  cable_list_sample.csv
-  bom_sample.csv
-  rule_check_report_sample.csv
-
-05_drawings/
-  P04_DO_001_020_sample.pdf
-  P99_SAFETY_CIRCUIT_WIRING_CANDIDATE.svg
-  drawing_qa_report_sample.json
-
-05_xg5000_import_ready/
-  xg5000_variable_description_import_sample.csv
-  xg5000_import_ready_final_verdict.md
-  xg5000_import_ready_manifest.json
-  xg5000_import_checklist.md
-
-07_screenshots/
-  xg5000_import_success_001.png
-  xg5000_import_success_002.png
+screenshots/
+  001.jpg
+  002.jpg
 ```
 
 ---
 
-## 5. 주요 기능
+## 4. 파일별 설명
 
-### 5.1 IO 목록 생성
+### 4.1 `01_review_pdf/IO500_REVIEW_ONLY_PACKAGE.pdf`
 
-비정형 수주서 내용을 기반으로 IO 후보를 구성합니다.
+IO500급 PLC 설계 검토 패키지를 하나의 PDF로 묶은 공개용 산출물입니다.
 
-포함 항목:
+포함 예시:
 
-- 입력 신호
-- 출력 신호
-- 안전 관련 신호
-- HMI 표시 후보
-- Spare IO
-- 설명문
-- XG5000 반입용 변수 설명 CSV
+- DI Wiring 도면 후보
+- DO Wiring 도면 후보
+- Safety Circuit 후보
+- Panel Layout 후보
+- Network / Communication Review 후보
+- Ladder Visual Review
+- XP-Builder / XGT Panel 스타일 HMI Preview
+- Alarm Monitor Preview
+- Manual Operation Preview
+- Engineering Closeout Checklist
+
+모든 페이지는 **REVIEW ONLY** 검토용 성격을 유지합니다.
 
 ---
 
-### 5.2 XG5000 Import 후보 파일 생성
+### 4.2 `02_hmi/hmi_tag_table.csv`
 
-XG5000에서 변수 설명 Import를 시도할 수 있는 CSV 후보 파일을 생성합니다.
+HMI 작화 검토를 위한 태그 후보 목록입니다.
 
-포함 항목:
+포함 예시:
+
+- 수위 표시용 아날로그 태그
+- 운전/정지/알람 상태 램프
+- 안전 조건 표시
+- IO 상태 모니터링 태그
+- 알람 이력 화면 후보
+- 내부 상태 표시용 HMI 태그 후보
+
+본 파일은 XP-Builder 최종 프로젝트 파일이 아니라 **작화 검토용 태그 후보 CSV**입니다.
+
+---
+
+### 4.3 `03_xg5000/xg5000_variable_description_import.csv`
+
+LS XG5000에서 변수/설명 반입을 검토하기 위한 CSV 후보 파일입니다.
+
+포함 예시:
 
 - 변수명
 - 타입
 - 디바이스 주소
-- 사용 여부
-- HMI 표시 여부
+- 사용 유무
+- HMI 연결 후보
 - 설명문
 
-본 샘플은 실제 `.xgw` 또는 `.xgp` 프로젝트 파일을 생성하지 않습니다.
-XG5000 테스트 프로젝트에서 Import, Build, Compile 검토를 수행하기 전 단계의 후보 파일세트입니다.
+실제 `.xgw` 또는 `.xgp` 프로젝트 파일을 자동 생성하는 단계가 아니라, XG5000 테스트 프로젝트에서 변수/설명 Import 가능성을 검토하기 위한 파일입니다.
 
 ---
 
-### 5.3 ST Draft 생성
+### 4.4 `screenshots/`
 
-ST 초안에는 다음 흐름이 포함됩니다.
+XG5000 화면에서 변수/설명 반입 결과를 확인한 스크린샷입니다.
 
-- Master Safety 조건
-- Auto / Manual Mode Gate
-- Maintenance Mode Gate
-- Fault Latch SET / RESET
-- 펌프 교번운전 후보
-- 수위 단계별 펌프 투입 후보
-- 누수 감지 시 구역별 정지 후보
-- 복전 후 HMI 재기동 확인 조건
-- 타임아웃 기반 Fault 전이
+스크린샷은 다음을 보여줍니다.
 
-예시 구조:
-
-```pascal
-SAFETY_OK :=
-  ESTOP_OK
-  AND MCC_MAIN_POWER_OK
-  AND UPS_POWER_OK
-  AND NOT LEAK_DETECTED_ANY
-  AND NOT OVERLOAD_ANY;
-
-IF POWER_RECOVERY_DETECTED THEN
-    RESUME_REQUIRED := TRUE;
-END_IF;
-
-IF HMI_RESUME_CONFIRM_PB AND ALARM_RESET_PB THEN
-    RESUME_REQUIRED := FALSE;
-END_IF;
-```
+- XG5000 변수/설명 화면 반입 결과
+- M 디바이스 기반 내부 변수 후보
+- Alarm latch/helper 변수 후보
+- Timer done helper 변수 후보
+- 한글 설명문 반입 상태
 
 ---
 
-### 5.4 Ladder Draft 생성
+## 5. 자동 생성 범위
 
-Ladder Draft는 사람이 읽을 수 있는 네트워크 단위 검토 문서로 생성됩니다.
-
-예시:
-
-```text
-N001 - Master Safety Permit
-ESTOP_OK AND MCC_MAIN_POWER_OK AND UPS_POWER_OK -> SAFETY_OK
-
-N002 - Power Recovery Hold
-POWER_RECOVERY_DETECTED -> SET RESUME_REQUIRED
-HMI_RESUME_CONFIRM_PB AND ALARM_RESET_PB -> RESET RESUME_REQUIRED
-
-N007 - T1 Stage Demand
-MID=1 pump, HIGH=2 pumps, HIGH_HIGH=3 pumps candidate
-
-N019 - Pump Start Fail Timer
-RUN_CMD AND NOT RUN_FB -> T_PUMP_START_FAIL -> alarm
-```
+| 영역 | 생성 내용 |
+|---|---|
+| IO | DI/DO/AI/AO 주소 후보, Spare IO, 설명문 |
+| 전장 | DI/DO 배선도 후보, Safety 후보, Panel Layout 후보 |
+| Logic | ST/Ladder 초안, Ladder Visual Review |
+| HMI | XP-Builder 스타일 Main / Alarm / Manual Preview |
+| Alarm | Alarm latch/helper 후보, 알람 이력 화면 후보 |
+| XG5000 | 변수/설명 Import CSV 후보 |
+| QA | Engineering Closeout Checklist, REVIEW REQUIRED 항목 |
 
 ---
 
-### 5.5 Ladder Visual PDF 생성
+## 6. REVIEW ONLY 원칙
 
-Ladder Draft를 PDF 형태로 시각화하여, XG5000 반입 전 로직 흐름을 사전 검토할 수 있도록 구성했습니다.
+본 저장소의 산출물은 **현장 최종본이 아닙니다.**
 
-포함 내용:
-
-- Master Safety Permit
-- Power Recovery Hold
-- Auto / Manual Mode Interlock
-- Maintenance Mode
-- Pump Availability
-- Pump Alternation Counter
-- Pump Run Command
-- Dry Run Protection
-- Leak Stop Zone
-- Pump Start Fail Timer
-- No Flow Timer
-- Valve Open / Close Fail Timer
-- Tower Lamp / Buzzer
-- Alarm Reset / Acknowledge
-- HMI Manual Output Gate
-- Runtime Counter
-- Communication Alarm
-- Level Transmitter Fault
-- Emergency Drain Review Flag
-- Spare IO Isolation
-
----
-
-### 5.6 전장 도면 후보 생성
-
-IO 목록을 기반으로 검토용 전장 도면 후보 PDF/SVG를 생성합니다.
-
-포함 예시:
-
-- DI/DO 주소 후보
-- 펌프 운전 명령
-- 밸브 열림/닫힘 명령
-- 경광등/부저 출력
-- DO COM 그룹
-- PLC Panel 후보
-- Spare 미결선 표시
-- REVIEW ONLY 표시
-
----
-
-### 5.7 QA 리포트 생성
-
-도면과 Ladder 시각화 결과에 대해 QA 리포트를 생성합니다.
-
-검토 항목 예시:
-
-- IO 개수 정합성
-- 페이지별 장치 수 제한
-- 연결 수 검토
-- DO COM 그룹 표시
-- Spare 미결선 표시
-- REVIEW ONLY 표시
-- Ladder Network 수
-- 출력 Coil 수
-- 긴 라벨 줄바꿈 처리
-- Negative Contact 표시
-
----
-
-## 6. 안전 및 검수 원칙
-
-이 저장소의 모든 산출물은 실제 설비 RUN 또는 다운로드 확정본이 아닙니다.
-
-반드시 다음 절차가 필요합니다.
+반드시 아래 절차가 필요합니다.
 
 1. 현장 IO 실사
-2. 실제 PLC 모듈 및 슬롯 확인
-3. XG5000 Import 테스트
-4. Build / Compile 수행
-5. 오프라인 시뮬레이션
-6. 선임 엔지니어 검토
-7. 전기/안전 담당자 검토
-8. 현장 시운전 전 최종 승인
+2. 실제 PLC 모듈 및 슬롯 확정
+3. 전장 도면 및 단자대 번호 확정
+4. MCCB / MC / SMPS / 전선 굵기 확정
+5. 안전 릴레이 / Safety Controller / PLr / SIL 검토
+6. XG5000 Import 테스트
+7. Build / Compile 검토
+8. XP-Builder HMI 태그 바인딩 검토
+9. 오프라인 시뮬레이션
+10. 현장 시운전 전 최종 승인
 
 ---
 
-## 7. 주요 Risk Flag
+## 7. Engineering Closeout 항목
 
-| 코드 | 등급 | 내용 |
+PDF 마지막 Closeout 페이지에는 현장 확정이 필요한 항목을 별도로 남깁니다.
+
+| 구분 | 검토 항목 | 상태 |
 |---|---|---|
-| RF-001 | critical | 실제 펌프/밸브/센서 수량은 현장 실사 필요 |
-| RF-002 | critical | 안전회로는 후보이며 실제 안전 릴레이/배선 확정 아님 |
-| RF-003 | high | Spare IO가 실제 동작 로직에 잘못 연결될 위험 |
-| RF-004 | high | 아날로그 수위계 스케일링 및 상하한 기준 미확정 |
-| RF-005 | high | 저수위 공회전 방지와 초고수위 비상배수 조건 충돌 가능성 검토 필요 |
-| RF-006 | medium | X/Y/M/D 주소는 실제 카드 구성에 따라 변경 필요 |
-| RF-007 | medium | 복전 후 자동 재기동 금지 조건은 현장 운전 정책 확인 필요 |
+| Electrical | MCCB / MC 용량 | REVIEW REQUIRED |
+| Electrical | SMPS 24VDC 용량 | REVIEW REQUIRED |
+| Electrical | 전선 굵기 / 단자 규격 | REVIEW REQUIRED |
+| Safety | Safety Relay / Controller 모델 | REVIEW REQUIRED |
+| PLC | XG5000 변수/주소 매핑 | IMPORT REVIEW REQUIRED |
+| HMI | XP-Builder HMI Tag Binding | HMI BINDING REQUIRED |
+| Network | IP / Protocol / Station | NETWORK REVIEW REQUIRED |
+| Test | Dry-run / Simulation / I/O Test | FIELD TEST REQUIRED |
 
 ---
 
 ## 8. 본 저장소에 포함하지 않는 것
 
-본 저장소에는 아래 항목을 포함하지 않습니다.
+아래 항목은 공개하지 않습니다.
 
 - 원본 PLC Package JSON 전체
 - 도메인맵 원본
-- 스키마 원본
+- 스키마 / 실행헌법 원본
 - 생성기 원본 코드
 - 랩핑기 원본 코드
-- 어댑터 원본 코드
-- 내부 평가 로직
+- 벤더 어댑터 원본 코드
+- 내부 QA Manifest 전체
 - 전체 ZIP 원본
-- 백업 폴더
-- Turn별 내부 개발 리포트
+- 학습 데이터셋
+- 모델 파일
 
-이 저장소는 엔진 원본 공개가 아니라, 엔진이 생성한 검토용 산출물 샘플을 보여주기 위한 포트폴리오입니다.
+이 저장소는 엔진 원본 공개가 아니라, 엔진이 생성한 **검토용 산출물 샘플**을 보여주기 위한 포트폴리오입니다.
 
 ---
 
 ## 9. 포트폴리오 설명 문장
 
-비정형 간단 메모형 수주서를 기준으로 폐수처리 집수조 자동제어 IO200급 PLC 설계 검토 패키지를 구성했습니다. 산출물은 IO List, HMI Tag/Alarm Table, XG5000 변수 설명 Import CSV, ST/Ladder 초안, Ladder 시각화 PDF, 인터락·알람 검토표, 전장 도면 후보, Drawing QA 리포트, 체크리스트와 리스크 플래그로 구성했으며, 모든 결과물은 실제 RUN 확정본이 아닌 선임 엔지니어 검토용 REVIEW ONLY 자료로 정리했습니다.
+비정형 간단 메모형 수주서를 기준으로 IO500급 폐수처리 자동화 PLC 설계 검토 패키지를 자동 구성했습니다. 결과물은 REVIEW ONLY PDF 패키지, HMI Tag Table, XG5000 변수 설명 Import CSV로 축약해 공개했으며, 실제 현장 RUN 확정본이 아니라 선임 엔지니어가 검토할 수 있는 1차 설계 초안 패키지입니다.
 
 ---
 
@@ -319,18 +228,18 @@ IO 목록을 기반으로 검토용 전장 도면 후보 PDF/SVG를 생성합니
 이 프로젝트는 다음 역량을 보여주기 위한 포트폴리오입니다.
 
 - 비정형 수주서 해석
-- PLC 설계 자료 구조화
-- IO/HMI/알람/인터락 정리
-- XG5000 Import 후보 파일 생성
-- ST/Ladder 초안 생성
-- Ladder 시각화
-- 전장 도면 후보 생성
-- QA 리포트 구성
-- REVIEW ONLY 기준의 안전한 검토 패키지 구성
+- 대형 IO 규모 PLC 설계 자료 구조화
+- LS XGT / XG5000 기준 주소·변수 후보 생성
+- HMI 태그 후보 생성
+- 전장 도면 후보 PDF 생성
+- Ladder Visual Review 생성
+- REVIEW ONLY 기준의 안전한 공개 패키지 구성
+- 엔지니어 검토 전 단계의 설계 초안 자동화
 
 ---
 
 ## 11. 주의
 
 본 샘플은 학습 및 포트폴리오 목적의 검토용 자료입니다.
-실제 설비에 적용하기 위해서는 반드시 현장 엔지니어, 전기 담당자, 안전 담당자의 검토와 XG5000 Build/Compile, 오프라인 테스트, 현장 시운전 절차가 필요합니다.
+
+실제 설비에 적용하기 위해서는 반드시 현장 엔지니어, 전기 담당자, 안전 담당자의 검토와 XG5000 Build/Compile, XP-Builder HMI 바인딩, 오프라인 테스트, 현장 시운전 절차가 필요합니다.
